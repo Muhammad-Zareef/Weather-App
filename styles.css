@@ -10,7 +10,6 @@ body {
     background-size: cover;
     color: white;
     min-height: 100vh;
-    /* transition: background 0.5s ease; */
 }
 
 .weather-app {
@@ -133,6 +132,34 @@ body {
     margin-right: 10px;
     font-size: 18px;
     opacity: 0.8;
+}
+
+.loader,
+.error-box {
+    display: none;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.loader {
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+.loader i {
+    margin-right: 8px;
+}
+
+.error-box {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.error-box i {
+    margin-right: 6px;
 }
 
 @media (max-width: 600px) {

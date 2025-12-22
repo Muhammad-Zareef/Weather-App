@@ -12,11 +12,20 @@
 
     <div class="weather-app">
         <div class="search-container">
-            <input type="text" class="search-input" id="search-input" placeholder="Search for a city...">
+            <input type="text" class="search-input" id="search-input" placeholder="Search for a city..." />
             <button class="search-btn" id="search-btn"><i class="fas fa-search"></i></button>
         </div>
-        <div class="weather-display">
+        <!-- Loader -->
+        <div class="loader" id="loader">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Loading weather...</span>
         </div>
+        <!-- Error Message -->
+        <div class="error-box" id="error-box">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="error-text">City not found</span>
+        </div>
+        <div class="weather-display"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>

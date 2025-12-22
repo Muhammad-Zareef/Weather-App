@@ -1,37 +1,66 @@
 
 const searchInput = document.querySelector('#search-input');
-const searchButton = document.querySelector('#search-btn');
+const loader = document.getElementById("loader");
+const errorBox = document.getElementById("error-box");
+const errorText = document.getElementById("error-text");
 const apiKey = '1f4f089e1af8d5b2637c6b22bf71d25e';
 
+function showLoader() {
+    loader.style.display = "block";
+    errorBox.style.display = "none";
+}
+
+function hideLoader() {
+    loader.style.display = "none";
+}
+
+function showError(message) {
+    hideLoader();
+    errorText.textContent = message;
+    errorBox.style.display = "block";
+}
+
 let main = async (event, api = "") => {
-    const city = searchInput.value;
+    const city = searchInput.value.trim();
+    if (city === "" && api == false) {
+        searchInput.value = "";
+        searchInput.focus();
+        return;
+    }
     let URL = "";
     if (api) {
         URL = api;
     } else {
         URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     }
-    if (city.trim() === "" && api == false) {
-        searchInput.value = "";
-        searchInput.focus();
-        return;
-    }
     try {
+        showLoader();
         let data = await getData(URL);
+        hideLoader();
+        if (data.cod == 404) {
+            showError("City not found");
+            searchInput.value = "";
+            searchInput.focus();
+            return;
+        }
         displayWeather(data);
         getBgImage(data);
     } catch (err) {
-        alert('City not found');
-        console.log("Error: " + err);
+        showError("City not found");
+        searchInput.value = "";
+        searchInput.focus();
+        console.error("Error: ", err);
     }
 }
 
-searchButton.addEventListener('click', main);
-
-let getData = async (URL) => {
-    let response = await fetch(URL);
-    let data = await response.json();
-    return data;
+const getData = async URL => {
+    try {
+        let response = await fetch(URL);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Getting weather details error:'), error;
+    }
 }
 
 const displayWeather = (data) => {
@@ -42,7 +71,6 @@ const displayWeather = (data) => {
         <h1 class="location">${data.name}, ${data.sys.country}</h1>
         <p class="date">${getLocalDateTime(data.timezone)}</p>
     </div>
-
     <div class="weather-main">
         <div class="temperature">
             <span class="temp-value">${data.main.temp}</span>
@@ -53,7 +81,6 @@ const displayWeather = (data) => {
         </div>
         <div class="weather-description">${data.weather[0].description}</div>
     </div>
-    
     <div class="weather-details">
         <div class="detail">
             <i class="fas fa-temperature-high"></i>
@@ -101,7 +128,7 @@ let getBgImage = async (data) => {
         let body = document.body;
         body.style.backgroundImage = `url("${data.urls.regular}")`;
     } catch (err) {
-        throw new Error(err);
+        console.error('Getting background image error:', err);
     }
 }
 
@@ -115,14 +142,6 @@ const currentLocation = () => {
         }, err => reject("Please allow location"));
     });
 }
-
-let currlocation = currentLocation();
-currlocation.then((res) => {
-    const api = `https://api.openweathermap.org/data/2.5/weather?lat=${res.latitude}&lon=${res.longitude}&units=metric&appid=${apiKey}`;
-    main("", api);
-}).catch((err) => {
-    console.log(err);
-})
 
 function getQuery(weatherCondition) {
     let query = '';
@@ -152,3 +171,15 @@ const getLocalDateTime = offsetInSeconds => {
     const localTime = utcTime.add(offsetInSeconds, 'seconds');
     return localTime.format("ddd MMMM DD YYYY, h:mm A");
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    let currlocation = currentLocation();
+    currlocation.then((res) => {
+        const api = `https://api.openweathermap.org/data/2.5/weather?lat=${res.latitude}&lon=${res.longitude}&units=metric&appid=${apiKey}`;
+        main("", api);
+    }).catch((err) => console.error(err));
+    document.querySelector('#search-btn').addEventListener('click', main);
+    document.querySelector('#search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') main();
+    });
+});
