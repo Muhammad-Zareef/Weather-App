@@ -118,7 +118,8 @@ const displayWeather = (data) => {
     `;
 }
 
-const ACCESS_KEY = '0NxMgA5WkM55Jxxun5eTm1dikozwgt-KF_kevyimjDk';
+const ACCESS_KEY = '6opGV1u84jC9z7qEElUsc1ecxfPwegPNabphcGeYWQw';
+// const ACCESS_KEY = '0NxMgA5WkM55Jxxun5eTm1dikozwgt-KF_kevyimjDk';
 
 let getBgImage = async (data) => {
     let query = getQuery(data.weather[0].description);
